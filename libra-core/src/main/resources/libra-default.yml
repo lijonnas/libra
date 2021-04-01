@@ -1,0 +1,19 @@
+# Default properties
+vaadin.urlMapping: /ui/*
+vaadin.heartbeatInterval: 30
+vaadin.closeIdleConnections: true
+
+server.servlet.session.timeout: 300
+
+libra.version: '@project.version@'
+libra.buildTime: '@librabuildtimestamp@'
+libra.build: 0
+# Efter an beforeJob, beforeStep, afterJob, afterStep event has been fired, let spring batch save the state before
+# fetching the state and send it to jobExecutionListeners
+libra.updateThreadSleepBeforeUpdate: 300
+# Additional job bean directories
+libra.jobBeansDir2: replaceme
+libra.jobBeansDir3: replaceme
+
+hsqldb.tx: mvcc
+libra.jobRepository.isolationLevelForCreate: ISOLATION_READ_COMMITTED

@@ -1,0 +1,208 @@
+.step-label {
+    font-size: 0.8em;
+    margin-left: 4px;
+}
+.step-label.flow-0 {
+    border-left: 5px solid #ffffff;
+    padding-left: 5px;
+    margin-left: 0;
+}
+.step-label.flow-1 {
+    border-left: 5px solid #bbbbbb;
+    padding-left: 5px;
+    margin-left: 0;
+}
+.batch_status_label {
+    display: inline-block;
+    margin-left: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 0.6em;
+    color: #eeeeee;
+    border-radius: var(--lumo-border-radius-m);
+}
+.batch_status {
+    background-color: var(--lumo-contrast-30pct);
+}
+.batch_status[data-status="COMPLETED"] {
+    background-color: var(--lumo-success-color);
+}
+.batch_status[data-status="ABANDONED"] {
+    background-color: var(--lumo-error-color-50pct);
+}
+.batch_status[data-status="STARTED"] {
+    background-color:var(--lumo-primary-color);
+
+    text-decoration: blink;
+    -webkit-animation-name: blinker;
+    -webkit-animation-duration: 1.5s;
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-timing-function:ease-in-out;
+    -webkit-animation-direction: alternate;
+}
+.batch_status[data-status="STARTING"] {
+    background-color:var(--lumo-primary-color);
+}
+.batch_status[data-status="FAILED"] {
+    background-color: var(--lumo-error-color);
+}
+.batch_status[data-status="STOPPED"] {
+    background-color: var(--lumo-primary-color);
+}
+.batch_status[data-status="STOPPING"] {
+    background-color: var(--lumo-primary-color);
+}
+.batch_status[data-status="UNKNOWN"] {
+    background-color: var(--lumo-contrast-30pct);
+}
+.batch_status.old_execution {
+    opacity: 0.7;
+}
+@-webkit-keyframes blinker {
+    from {opacity: 1.0;}
+    to {opacity: 0.3;}
+}
+.job-info {
+    font-size: var(--lumo-font-size-xs);
+}
+.step-row {
+    display: flex;
+    align-items: baseline;
+    flex-flow: row wrap;
+    margin: 0px;
+    padding: 2px;
+}
+.split-first {
+    background-image: url("../static/images/split-first.png");
+    background-repeat: no-repeat;
+}
+.split {
+    background-image: url("../static/images/split.png");
+    background-repeat: no-repeat;
+}
+.split-last {
+    background-image: url("../static/images/split-last.png");
+    background-repeat: no-repeat;
+    background-position: bottom 0px left 0px;
+}
+
+.step-progress {
+    width: 20px;
+}
+.build-info {
+    font-size: 0.75em;
+    margin-right: 10px;
+}
+.rotate {
+    -webkit-animation: rotation 2s infinite linear;
+}
+@-webkit-keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(359deg);
+    }
+}
+
+.step-progress-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 0.75em;
+}
+.step-progress-section {
+    text-align: center;
+    color: #eeeeee;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.step-progress-completed {
+    background-color: var(--lumo-success-color);
+}
+.step-progress-running {
+    -webkit-animation-name: blinker;
+    -webkit-animation-duration: 1.5s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-animation-direction: alternate;
+    background-color: var(--lumo-primary-color);
+}
+.step-progress-failed {
+    background-color: var(--lumo-error-color);
+}
+.step-progress-stopped {
+    background-color: var(--lumo-primary-color-50pct);
+}
+.step-progress-unknown {
+     background-color: var(--lumo-contrast-10pct);
+ }
+
+.step-flow {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: nowrap;
+}
+.step-flow-split {
+    display: flex;
+    flex-flow: row;
+    flex-grow: 1;
+}
+.step-flow-flow {
+    display: flex;
+    flex-flow: column;
+    flex-grow: 1;
+    min-width: 0px;
+    flex-basis: 0;
+
+}
+.step-flow-step {
+    display: flex;
+    flex-wrap: wrap;
+    color: white;
+    font-size: 0.65em;
+    overflow-x: hidden;
+    overflow-y: visible;
+    text-overflow: clip;
+    flex-grow: 1;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border-radius: var(--lumo-border-radius-m);
+    margin-left: 2px;
+    margin-right: 2px;
+    text-align: left;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    min-width: 0;
+}
+.job-grid {
+    display: table;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.job-grid-row {
+    display: table-row;
+    border-top: 1px solid var(--lumo-body-text-color);
+}
+.job-grid-cell {
+    display: table-cell;
+    border-bottom: 1px solid var(--lumo-tint-10pct);
+    padding: 10px;
+}
+.job-grid-steps-cell {
+    min-width: 500px;
+    max-width: 900px;
+}
+
+.margin-left {
+    margin-left: 6px;
+}
+.margin-right {
+    margin-right: 6px;
+}
