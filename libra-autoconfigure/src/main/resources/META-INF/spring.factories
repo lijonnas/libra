@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.envisioncn.gssc.libra.autoconfigure.LibraAutoConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=com.envisioncn.gssc.libra.autoconfigure.LibraAutoConfiguration
