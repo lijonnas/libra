@@ -18,6 +18,7 @@
         <lombok.version>1.18.16</lombok.version>
         <junit.version>4.13.2</junit.version>
         <camel-spring.version>3.9.0</camel-spring.version>
+        <librabuildtimestamp>${maven.build.timestamp}</librabuildtimestamp>
     </properties>
 
     <dependencyManagement>
