@@ -36,7 +36,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 /**
@@ -51,7 +50,7 @@ public class ScriptTasklet extends StepExecutionListenerSupport implements Stopp
 
     private List<String> scriptFiles = null;
 
-    private String executable = "sqlplus";
+    private String executable = "psql";
 
     private static final String SCRIPT_PARAMETER_PREFIX_JOBPARAM = "jobparam.";
     private static final String SCRIPT_PARAMETER_PREFIX_ENV = "env.";
@@ -80,18 +79,18 @@ public class ScriptTasklet extends StepExecutionListenerSupport implements Stopp
     @Autowired
     Environment env;
 
-    @Value("${bauta.reportDir}")
+    @Value("${libra.reportDir}")
     protected String reportDir;
 
     /**
-     * Execute system executable (sqlplus ..) and map its exit code to {@link ExitStatus}
+     * Execute system executable (psql ..) and map its exit code to {@link ExitStatus}
      * using {@link SystemProcessExitCodeMapper}.
      */
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         log.debug("execute..");
         stopping = false;
-        String logFileName = "sqlplus.log";
+        String logFileName = "psql.log";
 
         StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
         File logFile = ReportUtils.generateReportFile(reportDir, stepExecution, logFileName);
@@ -137,39 +136,34 @@ public class ScriptTasklet extends StepExecutionListenerSupport implements Stopp
                 pw.println(line);
                 pw.flush();
             }
-            FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
-
-                @Override
-                public Integer call() throws Exception {
-                    ArrayList<String> commands = new ArrayList<>();
-                    commands.add(executable);
-                    commands.add(easyConnectionIdentifier);
-                    commands.add("@" + scriptFile);
-                    commands.addAll(scriptParameterValues);
-                    log.debug("Command is: " + StringUtils.join(commands, ","));
-                    ProcessBuilder pb = new ProcessBuilder(commands);
-                    Map<String, String> env = pb.environment();
-                    env.putAll(environmentParams);
-                    pb.directory(scriptDir);
-                    pb.redirectErrorStream(true);
-                    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
-                    Process process = pb.start();
-                    log.debug("Starting process for {}", scriptFile);
-                    if (process.isAlive() && sendExitCommand) {
-                        // Pass en exit executable to
-                        log.debug("Passing EXIT executable..");
-                        try (OutputStream o = process.getOutputStream()) {
-                            String ls = System.getProperty("line.separator");
-                            o.write((ls + "EXIT" + ls).getBytes());
-                            o.flush();
-                        } catch (Exception e) {
-                            log.warn("Unexpected error when passing EXIT executable", e);
-                        }
+            FutureTask<Integer> systemCommandTask = new FutureTask<>(() -> {
+                ArrayList<String> commands = new ArrayList<>();
+                commands.add(executable);
+                commands.add(easyConnectionIdentifier);
+                commands.add("@" + scriptFile);
+                commands.addAll(scriptParameterValues);
+                log.debug("Command is: " + StringUtils.join(commands, ","));
+                ProcessBuilder pb = new ProcessBuilder(commands);
+                Map<String, String> env = pb.environment();
+                env.putAll(environmentParams);
+                pb.directory(scriptDir);
+                pb.redirectErrorStream(true);
+                pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
+                Process process = pb.start();
+                log.debug("Starting process for {}", scriptFile);
+                if (process.isAlive() && sendExitCommand) {
+                    // Pass en exit executable to
+                    log.debug("Passing EXIT executable..");
+                    try (OutputStream o = process.getOutputStream()) {
+                        String ls = System.getProperty("line.separator");
+                        o.write((ls + "EXIT" + ls).getBytes());
+                        o.flush();
+                    } catch (Exception e) {
+                        log.warn("Unexpected error when passing EXIT executable", e);
                     }
-
-                    return process.waitFor();
                 }
 
+                return process.waitFor();
             });
 
             long t0 = System.currentTimeMillis();
@@ -186,7 +180,7 @@ public class ScriptTasklet extends StepExecutionListenerSupport implements Stopp
                     // The log file must be checked for erros.
                     checkForErrorsInLog(logFile);
                     if (exitCode != 0) {
-                        throw new JobExecutionException("SQLPLUS exited with code " + exitCode);
+                        throw new JobExecutionException("PSQL exited with code " + exitCode);
                     }
                     break;
                 } else if (System.currentTimeMillis() - t0 > timeout) {
@@ -217,7 +211,7 @@ public class ScriptTasklet extends StepExecutionListenerSupport implements Stopp
      */
     private void checkForErrorsInLog(File logFile) throws JobExecutionException {
         try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(new FileInputStream(logFile)))) {
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("SP2-") || line.startsWith("CPY0") || line.startsWith("Warning:")) {
                     throw new JobExecutionException("There were SQL*Plus errors: " + line);

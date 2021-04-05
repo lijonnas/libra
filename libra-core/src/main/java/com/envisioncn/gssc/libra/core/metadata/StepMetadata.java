@@ -1,14 +1,16 @@
 package com.envisioncn.gssc.libra.core.metadata;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author jonnas
  * @date 2021-03-31
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class StepMetadata extends SubFlow {
-    public static enum StepType {
+    public enum StepType {
         /* SQL Scripts */
         SQL,
         /* Scheduled stored procedure */

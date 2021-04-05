@@ -39,8 +39,8 @@ public class ReportTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        List<String> fileNames = new ArrayList<String>();
-        List<String> urls = new ArrayList<String>();
+        List<String> fileNames = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
         List<ReportGenerationResult> failedResults = new ArrayList<>();
 
         for (ReportGenerator reportGenerator : reportGenerators) {

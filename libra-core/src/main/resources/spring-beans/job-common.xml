@@ -20,20 +20,20 @@ http://www.springframework.org/schema/batch http://www.springframework.org/schem
             <b:listener ref="libraManager"/>
         </b:listeners>
     </b:step>
-    <!-- Base for all SQL plus steps. Executes one or many SQL scripts using SQLPLUS -->
+    <!-- Executes one or many SQL scripts using psql -->
     <bean id="sqlplus-base" class="com.envisioncn.gssc.libra.batch.tasklets.postgresql.ScriptTasklet" abstract="true">
         <property name="scriptDir" value="${libra.scriptDir}"/>
         <property name="timeout" value="7200000"/>
         <property name="sendExitCommand" value="true"/>:
 <!--        <property name="easyConnectionIdentifier" value="${libra.stagingDB.sqlplus.connectionIdentifier:empty}"/>-->
-        <property name="environmentParams">
-            <map>
+<!--        <property name="environmentParams">-->
+<!--            <map>-->
                 <!-- Here you can set general environment params that will be applied in all child beans -->
                 <!--<entry key="NLS_LANG" value="AMERICAN_AMERICA.WE8MSWIN1252"/>-->
                 <!--<entry key="NLS_NUMERIC_CHARACTERS" value=",."/>-->
                 <!--<entry key="NLS_LENGTH_SEMANTICS" value="${libra.stagingDB.nls_length_semantics}"/>-->
-            </map>
-        </property>
+<!--            </map>-->
+<!--        </property>-->
     </bean>
     <!-- Sqlplus executable run as admin user -->
     <bean id="sqlplus-admin-base" class="com.envisioncn.gssc.libra.batch.tasklets.postgresql.ScriptTasklet" abstract="true">
@@ -50,8 +50,9 @@ http://www.springframework.org/schema/batch http://www.springframework.org/schem
             </map>
         </property>
     </bean>
+    <bean id="libraManager"/>
 
-<!--    <bean id="sqlcl-base" class="com.envisioncn.gssc.libra.batch.tasklets.postgresql.SqlClTasklet" abstract="true">-->
+    <!--    <bean id="sqlcl-base" class="com.envisioncn.gssc.libra.batch.tasklets.postgresql.SqlClTasklet" abstract="true">-->
 <!--        <property name="scriptDir" value="${libra.scriptDir}"/>-->
 <!--        <property name="timeout" value="7200000"/>-->
 <!--        <property name="easyConnectionIdentifier" value="${libra.stagingDB.sqlplus.connectionIdentifier:empty}"/>-->

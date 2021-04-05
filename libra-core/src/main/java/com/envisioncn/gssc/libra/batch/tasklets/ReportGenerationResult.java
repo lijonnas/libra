@@ -17,7 +17,7 @@ public class ReportGenerationResult {
         OK,
         /* Indicates that the step should be considered failed. */
         Failed
-    };
+    }
 
     @NonNull
     private ReportGenerationResultStatus status;

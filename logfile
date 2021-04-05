@@ -1,0 +1,13 @@
+2021-04-05 15:55:53.602 CST [90666] LOG:  starting PostgreSQL 13.2 on arm-apple-darwin20.3.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit
+2021-04-05 15:55:53.602 CST [90666] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2021-04-05 15:55:53.602 CST [90666] LOG:  listening on IPv6 address "::1", port 5432
+2021-04-05 15:55:53.603 CST [90666] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2021-04-05 15:55:53.604 CST [90667] LOG:  database system was shut down at 2021-04-05 15:55:26 CST
+2021-04-05 15:55:53.606 CST [90666] LOG:  database system is ready to accept connections
+2021-04-05 15:56:07.564 CST [90702] FATAL:  database "zhongshuangli" does not exist
+2021-04-05 15:56:30.908 CST [90739] FATAL:  database "zhongshuangli" does not exist
+2021-04-05 15:56:45.399 CST [90749] FATAL:  database "zhongshuangli" does not exist
+2021-04-05 15:59:33.833 CST [90756] ERROR:  syntax error at or near "with" at character 33
+2021-04-05 15:59:33.833 CST [90756] STATEMENT:  CREATE USER libra WITH PASSWORD with 'libra_test';
+2021-04-05 16:00:03.981 CST [90756] ERROR:  role "libra_test" does not exist
+2021-04-05 16:00:03.981 CST [90756] STATEMENT:  GRANT ALL PRIVILEGES ON DATABASE "libra" to libra_test;

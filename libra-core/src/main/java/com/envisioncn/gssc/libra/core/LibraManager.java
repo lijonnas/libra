@@ -6,6 +6,7 @@ import com.envisioncn.gssc.libra.core.metadata.JobMetadataReader;
 import com.envisioncn.gssc.libra.core.metadata.StepMetadata;
 import com.envisioncn.gssc.libra.scheduling.JobTrigger;
 import com.envisioncn.gssc.libra.scheduling.JobTriggerDao;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
@@ -160,6 +162,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
             try {
                 for (Long executionId : jobOperator.getRunningExecutions(jobName)) {
                     JobExecution je = jobExplorer.getJobExecution(executionId);
+                    assert je != null;
                     if (startTime.after(je.getStartTime())) {
                         log.warn("Job {}, executionId {} is stored as running, but startTime is before (re)start. Changing to FAILED", jobName, executionId);
                         je.setEndTime(new Date());
@@ -237,7 +240,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
             }
         }
         if (jobParams != null) {
-            paramsStr.append("," + jobParams);
+            paramsStr.append(",").append(jobParams);
         }
         log.debug("Starting job {} with jobParams: {}", jobName, paramsStr);
         return jobOperator.start(jobName, paramsStr.toString());
@@ -440,7 +443,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
                     Thread.sleep(updateThreadSleepBeforeUpdate);
                     JobExecution je = jobExplorer.getJobExecution(signal.getJobExecutionId());
                     updatedJobExecutions.remove(signal);
-                    jobInstanceInfo = extractJobInstanceInfo(je, true);
+                    jobInstanceInfo = extractJobInstanceInfo(Objects.requireNonNull(je), true);
                     jobInstanceInfoCache.put(jobInstanceInfo.getName(), jobInstanceInfo);
 
                     if (signal.getUpdateType() == JobUpdateSignal.UpdateType.StepUpdate) {
@@ -524,7 +527,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
         log.debug("extractJobInstanceInfo: {}, mergeOlder: {}", je, mergeOlderExecutions);
         JobInstanceInfo jobInstanceInfo = new JobInstanceInfo(je.getJobInstance().getJobName());
         FlowJob job = (FlowJob) jobRegistry.getJob(je.getJobInstance().getJobName());
-        HashMap<String, StepInfo> idToStepInfo = new HashMap<>();
+        HashMap<String, StepInfo> idToStepInfo = Maps.newHashMap();
         if (mergeOlderExecutions) {
             JobMetadata jobMetadata = jobMetadataReader.getMetadata(jobName);
             jobInstanceInfo.setDescription(jobMetadata.getDescription());
@@ -543,7 +546,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
         }
 
         JobParametersValidator jobParametersValidator = job.getJobParametersValidator();
-        if (jobParametersValidator != null && jobParametersValidator instanceof JobParametersProvider) {
+        if (jobParametersValidator instanceof JobParametersProvider) {
             JobParametersProvider validator = (JobParametersProvider)jobParametersValidator;
             jobInstanceInfo.setRequiredJobParamKeys(validator.getRequiredKeys());
             jobInstanceInfo.setOptionalJobParamKeys(validator.getOptionalKeys());
@@ -590,7 +593,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
                 }
                 executionCount++;
                 JobExecution jeh = jobExplorer.getJobExecution(executionId);
-                if (jeh.getEndTime() != null) {
+                if (Objects.requireNonNull(jeh).getEndTime() != null) {
                     totalDuration += jeh.getEndTime().getTime() - jeh.getStartTime().getTime();
                 }
                 for (StepExecution seh : jeh.getStepExecutions()) {
@@ -693,7 +696,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
             if (executions.size() > 0) {
                 long latestExecutionId = executions.get(0);
                 JobExecution jobExecution = jobExplorer.getJobExecution(latestExecutionId);
-                out = extractJobInstanceInfo(jobExecution, true);
+                out = extractJobInstanceInfo(Objects.requireNonNull(jobExecution), true);
             }
             jobInstanceInfoCache.put(jobName, out);
         }
@@ -745,7 +748,9 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
      * @throws Exception
      */
     public int rebuildServer() throws Exception {
-        if (!isRebuildSupported()) throw new RuntimeException("Refresh is not supported. Set libra.refreshServerCommand");
+        if (!isRebuildSupported()) {
+            throw new RuntimeException("Refresh is not supported. Set libra.refreshServerCommand");
+        }
         if (rebuilding) {
             // Already rebuilding
             return -1;
@@ -758,7 +763,7 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
             throw new RuntimeException("rebuildServerCommand is not set");
         }
         // Split command to support parameters, e.g. "rebuild_server param1 param2"
-        String rebuildServerCommands[] =  StringUtils.split(rebuildServerCommand, " ");
+        String[] rebuildServerCommands =  StringUtils.split(rebuildServerCommand, " ");
         log.info("Executing rebuildServerCommand: '{}'", (Object)rebuildServerCommands);
         ProcessBuilder pb = new ProcessBuilder(rebuildServerCommands);
         Process process = pb.start();
@@ -772,8 +777,10 @@ public class LibraManager implements StepExecutionListener, JobExecutionListener
     }
 
     public int refreshServer() throws Exception  {
-        if (!isRefreshSupported()) throw new RuntimeException("Refresh is not supported. Set libra.refreshServerCommand");
-        String refreshServerCommands[] =  StringUtils.split(refreshServerCommand, " ");
+        if (!isRefreshSupported()) {
+            throw new RuntimeException("Refresh is not supported. Set libra.refreshServerCommand");
+        }
+        String[] refreshServerCommands =  StringUtils.split(refreshServerCommand, " ");
         log.info("Executing refreshServerCommand: '{}'", (Object)refreshServerCommands);
         ProcessBuilder pb = new ProcessBuilder(refreshServerCommands);
         Process process = pb.start();

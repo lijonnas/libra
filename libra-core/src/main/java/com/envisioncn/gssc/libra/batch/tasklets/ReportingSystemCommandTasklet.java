@@ -37,7 +37,7 @@ import java.util.concurrent.FutureTask;
  * @author zhongshuangli
  * @date 2021-04-01
  */
-@Slf4j()
+@Slf4j
 public class ReportingSystemCommandTasklet extends StepExecutionListenerSupport
         implements StoppableTasklet, InitializingBean {
 
@@ -94,46 +94,42 @@ public class ReportingSystemCommandTasklet extends StepExecutionListenerSupport
             pw.flush();
 
         }
-        FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
-
-            @Override
-            public Integer call() throws Exception {
-                ArrayList<String> commands = new ArrayList<>();
-                String scriptParams = StringUtils.join(scriptParameterValues, " ");
-                if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                    log.debug("Running on windows.");
-                    commands.add("cmd.exe");
-                    commands.add("/c");
-                    //commands.add("exit | " +  executable);
-                    //commands.add(easyConnectionIdentifier);
-                    //commands.add("@" + scriptFile);
-                    //commands.addAll(scriptParameterValues);
-                    commands.add(command);
-                } else {
-                    commands.add("/bin/sh");
-                    commands.add("-c");
-                    commands.add(command);
-                }
-
-                log.debug("Command is: " + StringUtils.join(commands, ","));
-                ProcessBuilder pb = new ProcessBuilder(commands);
-
-                if (environmentParams != null) {
-                    Map<String, String> env = pb.environment();
-                    env.putAll(environmentParams);
-                }
-
-                pb.directory(workingDirectory);
-                pb.redirectErrorStream(true);
-                pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
-                pb.redirectError(ProcessBuilder.Redirect.appendTo(logFile));
-
-                Process process = pb.start();
-
-                log.debug("Starting process for {}", command);
-
-                return process.waitFor();
+        FutureTask<Integer> systemCommandTask = new FutureTask<>(() -> {
+            ArrayList<String> commands = new ArrayList<>();
+            String scriptParams = StringUtils.join(scriptParameterValues, " ");
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                log.debug("Running on windows.");
+                commands.add("cmd.exe");
+                commands.add("/c");
+                //commands.add("exit | " +  executable);
+                //commands.add(easyConnectionIdentifier);
+                //commands.add("@" + scriptFile);
+                //commands.addAll(scriptParameterValues);
+                commands.add(command);
+            } else {
+                commands.add("/bin/sh");
+                commands.add("-c");
+                commands.add(command);
             }
+
+            log.debug("Command is: " + StringUtils.join(commands, ","));
+            ProcessBuilder pb = new ProcessBuilder(commands);
+
+            if (environmentParams != null) {
+                Map<String, String> env = pb.environment();
+                env.putAll(environmentParams);
+            }
+
+            pb.directory(workingDirectory);
+            pb.redirectErrorStream(true);
+            pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
+            pb.redirectError(ProcessBuilder.Redirect.appendTo(logFile));
+
+            Process process = pb.start();
+
+            log.debug("Starting process for {}", command);
+
+            return process.waitFor();
         });
 
         long t0 = System.currentTimeMillis();

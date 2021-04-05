@@ -2,6 +2,7 @@ package com.envisioncn.gssc.libra.ui;
 
 import com.envisioncn.gssc.libra.core.BasicJobInstanceInfo;
 import com.envisioncn.gssc.libra.core.LibraManager;
+import com.google.common.collect.Maps;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -27,6 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 public class JobButtons extends FlexLayout {
+    private static final long serialVersionUID = -1688734384151952795L;
     private LibraManager libraManager;
 
     private MainView mainView;
@@ -169,20 +171,18 @@ public class JobButtons extends FlexLayout {
         try {
             libraManager.startJob(item.getName(), params);
         }
-        catch(JobParametersInvalidException e) {
+        catch(JobParametersInvalidException | NoSuchJobException e) {
             UIUtils.showErrorMessage(e.getMessage());
         } catch (JobInstanceAlreadyExistsException e) {
             UIUtils.showErrorMessage("This job is already running");
-        } catch (NoSuchJobException e) {
-            UIUtils.showErrorMessage(e.getMessage());
         }
     }
 
     private Dialog createJobParamsDialog(BasicJobInstanceInfo job) {
         Dialog dialog = new Dialog();
         dialog.setWidth("700");
-        HashMap<String, TextField> requiredTextFields = new HashMap<>();
-        HashMap<String, TextField> optionalTextFields = new HashMap<>();
+        HashMap<String, TextField> requiredTextFields = Maps.newHashMap();
+        HashMap<String, TextField> optionalTextFields = Maps.newHashMap();
 
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setWidthFull();
@@ -228,9 +228,7 @@ public class JobButtons extends FlexLayout {
 
         });
         startButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Button cancelButton = new Button("Cancel", clickEvent -> {
-            dialog.close();
-        });
+        Button cancelButton = new Button("Cancel", clickEvent -> dialog.close());
         HorizontalLayout hl = new HorizontalLayout();
         hl.add(startButton);
         hl.add(cancelButton);

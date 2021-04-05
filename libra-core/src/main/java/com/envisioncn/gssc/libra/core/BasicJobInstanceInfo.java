@@ -44,7 +44,7 @@ public class BasicJobInstanceInfo {
 
 
     public boolean isRestartable() {
-        return latestExecutionId != null && exitStatus != null && (exitStatus.equals("STOPPED") || exitStatus.equals("FAILED"));
+        return latestExecutionId != null && ("STOPPED".equals(exitStatus) || "FAILED".equals(exitStatus));
     }
 
     @Override

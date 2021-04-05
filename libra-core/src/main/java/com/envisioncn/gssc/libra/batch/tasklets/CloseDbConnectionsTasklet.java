@@ -74,7 +74,10 @@ public class CloseDbConnectionsTasklet extends ReportTasklet implements ReportGe
                 writer.append("No connections to close. Doing nothing").append(System.lineSeparator());
             }
             else {
-                writer.append("Closed " + initiallyIdle + " idle connections").append(System.lineSeparator());
+                writer.append("Closed ")
+                        .append(String.valueOf(initiallyIdle))
+                        .append(" idle connections")
+                        .append(System.lineSeparator());
             }
         }
         return ReportGenerationResult.OK;

@@ -13,10 +13,11 @@ import java.util.List;
  * @date 2021-03-31
  */
 public class ConfirmationValidator implements JobParametersValidator, JobParametersProvider {
-    private List<String> requiredKeys = Arrays.asList(new String[]{"confirm"});
+    private final List<String> requiredKeys = Collections.singletonList("confirm");
 
     @Override
     public void validate(JobParameters parameters) throws JobParametersInvalidException {
+        assert parameters != null;
         String confirm = parameters.getString("confirm");
         if (!"yes".equalsIgnoreCase(confirm)) {
             throw new JobParametersInvalidException("You must confirm with a 'yes'!");

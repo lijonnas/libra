@@ -11,6 +11,7 @@ import com.vaadin.flow.dom.Element;
  */
 @Tag("div")
 public class StepProgressBar extends Component {
+    private static final long serialVersionUID = 1582084724729847571L;
     Element unknownSection = new Element("div");
     Element completedSection = new Element("div");
     Element failedSection = new Element("div");

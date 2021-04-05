@@ -22,6 +22,7 @@ import java.util.Locale;
 @Slf4j
 @Component
 public class ConfigureUIServiceInitListener implements VaadinServiceInitListener {
+    private static final long serialVersionUID = -3268748534073545991L;
     private final String LOCALE_COOKIE_NAME = "libra-locale";
 
     @Override

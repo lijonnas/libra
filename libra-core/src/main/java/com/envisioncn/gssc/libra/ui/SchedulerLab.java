@@ -12,9 +12,9 @@ import java.util.Date;
  * @date 2021-04-01
  */
 public class SchedulerLab {
-    public static void main(String args[]) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         Date date = new Date();
-        DateFormat tstampFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+        DateFormat tstampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(tstampFormat.format(date));
         ThreadPoolTaskScheduler s
                 = new ThreadPoolTaskScheduler();
@@ -22,12 +22,8 @@ public class SchedulerLab {
         s.setThreadNamePrefix(
                 "ThreadPoolTaskScheduler");
         s.initialize();
-        Runnable jobStarter = new Runnable()  {
-            public void run() {
-                System.out.println("Starting job");
-            }
-        };
-        for (int i=0;i<10;i++) {
+        Runnable jobStarter = () -> System.out.println("Starting job");
+        for (int i=0;i < 10; i++) {
             s.initialize();
             CronTrigger cronTrigger = new CronTrigger("* * * * * *");
             s.schedule(jobStarter, cronTrigger);

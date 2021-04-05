@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class SecurityConfig {
     private Boolean enabled;
-    private User users[];
+    private User[] users;
 }
 

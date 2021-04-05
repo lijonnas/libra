@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +86,7 @@ public class SqlValidationTasklet extends ThymeleafReportTasklet implements Repo
 
         if (configuration != null) {
             ObjectMapper mapper = new ObjectMapper();
-            SqlValidation vs[] = mapper.readValue(configuration, SqlValidation[].class);
+            SqlValidation[] vs = mapper.readValue(configuration, SqlValidation[].class);
             this.validations = new ArrayList<>(vs.length);
             Collections.addAll(this.validations, vs);
         }
@@ -104,7 +105,7 @@ public class SqlValidationTasklet extends ThymeleafReportTasklet implements Repo
         int failedValidations = validate();
         context.setVariable("validations", validations);
         log.debug("Writing report ..");
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(reportFile), "utf-8")) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(reportFile), StandardCharsets.UTF_8)) {
             templateEngine.process("sql_validation_report", context, writer);
         }
         log.debug("Writing report, done!");

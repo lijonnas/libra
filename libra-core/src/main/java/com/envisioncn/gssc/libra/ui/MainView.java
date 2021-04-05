@@ -6,6 +6,7 @@ import com.envisioncn.gssc.libra.core.JobInstanceInfo;
 import com.envisioncn.gssc.libra.core.LibraManager;
 import com.envisioncn.gssc.libra.core.StepInfo;
 import com.envisioncn.gssc.libra.security.SecurityUtils;
+import com.google.common.collect.Maps;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.DetachEvent;
@@ -85,7 +86,7 @@ import java.util.stream.Stream;
 @Route("")
 @PreserveOnRefresh()
 //@Theme(value = Material.class, variant = Material.LIGHT)
-@Theme(value = Lumo.class, variant = Lumo.DARK)
+//@Theme(value = "Lumo", variant = Lumo.DARK)
 // @PWA(name = "Project Base for Vaadin Flow with Spring", shortName = "Project Base")
 @CssImport(value = "./styles/job-grid-theme.css", themeFor = "vaadin-grid")
 @CssImport(value = "./styles/libra-styles.css")
@@ -94,6 +95,7 @@ import java.util.stream.Stream;
 @Secured({"ROLE_BATCH_VIEW", "ROLE_BATCH_EXECUTE", "ROLE_ADMIN"})
 public class MainView extends AppLayout implements JobEventListener {
 
+    private static final long serialVersionUID = 5609864583519401299L;
     Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     LibraManager libraManager;
@@ -161,12 +163,7 @@ public class MainView extends AppLayout implements JobEventListener {
         jobGrid.getChildren().forEach(component ->{
             String jobName = component.getElement().getAttribute("data-job-name");
             if (!tfJobFilter.isEmpty()) {
-                if (!StringUtils.containsIgnoreCase(jobName, tfJobFilter.getValue()))  {
-                    component.setVisible(false);
-                }
-                else {
-                    component.setVisible(true);
-                }
+                component.setVisible(StringUtils.containsIgnoreCase(jobName, tfJobFilter.getValue()));
             }
             else {
                 component.setVisible(true);
@@ -365,7 +362,7 @@ public class MainView extends AppLayout implements JobEventListener {
         aboutView.setPadding(true);
         aboutView.setHeightFull();
         aboutView.setWidthFull();
-        serverInfoGrid = new Grid<String>(String.class, false);
+        serverInfoGrid = new Grid<>(String.class, false);
         serverInfoGrid.addColumn(item -> item);
         serverInfoGrid.addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
         serverInfoGrid.setHeightFull();
@@ -376,9 +373,7 @@ public class MainView extends AppLayout implements JobEventListener {
 
     private Component createJobView() {
         VerticalLayout vl = new VerticalLayout();
-        tfJobFilter = new TextField(event -> {
-            filterJobGrid();
-        });
+        tfJobFilter = new TextField(event -> filterJobGrid());
         tfJobFilter.setPlaceholder("Job filter");
         vl.add(tfJobFilter);
         jobGrid = new Div();
@@ -438,12 +433,10 @@ public class MainView extends AppLayout implements JobEventListener {
         try {
             libraManager.startJob(item.getName(), params);
         }
-        catch(JobParametersInvalidException e) {
+        catch(JobParametersInvalidException | NoSuchJobException e) {
             showErrorMessage(e.getMessage());
         } catch (JobInstanceAlreadyExistsException e) {
             showErrorMessage("This job is already running");
-        } catch (NoSuchJobException e) {
-            showErrorMessage(e.getMessage());
         }
     }
 
@@ -463,16 +456,16 @@ public class MainView extends AppLayout implements JobEventListener {
         for (JobInstanceInfo job : jobDetails) {
             String currentSplit = null;
             String currentFlow = null;
-            HashMap<String, MutableLong> flowDurations = new HashMap<>();
+            HashMap<String, MutableLong> flowDurations = Maps.newHashMap();
             // Which flows runs within which splits?
-            HashMap<String, Set<String>> splitToFlows = new HashMap<>();
-            HashMap<String, Long> splitDurations = new HashMap<>();
-            HashMap<String, String> flowAlias = new HashMap<>();
+            HashMap<String, Set<String>> splitToFlows = Maps.newHashMap();
+            HashMap<String, Long> splitDurations = Maps.newHashMap();
+            HashMap<String, String> flowAlias = Maps.newHashMap();
             int flowCount = 0;
             // First round, calculate flow durations
             for (StepInfo step : job.getSteps()) {
                 if (step.getFlowId() != null) {
-                    if (currentFlow == null || !step.getFlowId().equals(currentFlow)) {
+                    if (!step.getFlowId().equals(currentFlow)) {
                         currentFlow = step.getFlowId();
                         flowDurations.put(currentFlow, new MutableLong(0));
                         flowCount++;
@@ -490,7 +483,7 @@ public class MainView extends AppLayout implements JobEventListener {
             // Calculate Split durations by calculating max of its flow durations
             for (StepInfo step : job.getSteps()) {
                 if (step.getSplitId() != null) {
-                    if (currentSplit == null || !step.getSplitId().equals(currentSplit)) {
+                    if (!step.getSplitId().equals(currentSplit)) {
                         currentSplit = step.getSplitId();
                         Set<String> flowIds = splitToFlows.get(step.getSplitId());
                         if (flowIds != null) {
@@ -506,7 +499,7 @@ public class MainView extends AppLayout implements JobEventListener {
                 }
             }
             // Calculate total duration: sum of splits + steps that are not part of a split
-            Long totalDuration = splitDurations.values().stream().collect(Collectors.summingLong(Long::longValue));
+            Long totalDuration = splitDurations.values().stream().mapToLong(Long::longValue).sum();
             for (StepInfo step : job.getSteps()) {
                 if (step.getSplitId() == null) {
                     totalDuration += step.getDuration();
@@ -606,7 +599,7 @@ public class MainView extends AppLayout implements JobEventListener {
             grid.setWidthFull();
             grid.addColumn(StepInfo::getName).setHeader("Name").setAutoWidth(true);
             //grid.addColumn(StepInfo::getExecutionStatus).setHeader("Status");
-            grid.addColumn(item-> item.getType()).setHeader("Type");
+            grid.addColumn(StepInfo::getType).setHeader("Type");
 
             grid.addComponentColumn(item -> createStatusLabel(item.getExecutionStatus(), false)).setHeader("Status");
             grid.addComponentColumn(item -> new Label(DurationFormatUtils.formatDuration(item.getDuration(), "HH:mm:ss"))).setHeader("Duration");
@@ -646,8 +639,8 @@ public class MainView extends AppLayout implements JobEventListener {
     private Dialog createJobParamsDialog(JobInstanceInfo job) {
         Dialog dialog = new Dialog();
         dialog.setWidth("700");
-        HashMap<String, TextField> requiredTextFields = new HashMap<>();
-        HashMap<String, TextField> optionalTextFields = new HashMap<>();
+        HashMap<String, TextField> requiredTextFields = Maps.newHashMap();
+        HashMap<String, TextField> optionalTextFields = Maps.newHashMap();
 
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setWidthFull();
@@ -676,7 +669,7 @@ public class MainView extends AppLayout implements JobEventListener {
         }
 
         Button startButton = new Button("Start", clickEvent -> {
-            HashMap<String, String> params = new HashMap<>();
+            HashMap<String, String> params = Maps.newHashMap();
             for (Map.Entry<String, TextField> field:requiredTextFields.entrySet()) {
                 if (StringUtils.isNotEmpty(field.getValue().getValue())) {
                     params.put(field.getKey(), field.getValue().getValue());
@@ -693,9 +686,7 @@ public class MainView extends AppLayout implements JobEventListener {
 
         });
         startButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Button cancelButton = new Button("Cancel", clickEvent -> {
-            dialog.close();
-        });
+        Button cancelButton = new Button("Cancel", clickEvent -> dialog.close());
         HorizontalLayout hl = new HorizontalLayout();
         hl.add(startButton);
         hl.add(cancelButton);

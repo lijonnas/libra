@@ -48,7 +48,8 @@ public class JobTriggerDao implements RowMapper<JobTrigger> {
 
     public List<JobTrigger> loadTriggers() {
         JdbcTemplate template = new JdbcTemplate(dataSource);
-        List<JobTrigger> out = template.query("select ID,JOB_NAME, TRIGGER_TYPE,TRIGGERING_JOB_NAME, CRON, JOB_PARAMETERS from SCHEDULING_TRIGGER", this);
+        String sql = "select ID,JOB_NAME, TRIGGER_TYPE,TRIGGERING_JOB_NAME, CRON, JOB_PARAMETERS from SCHEDULING_TRIGGER";
+        List<JobTrigger> out = template.query(sql, this);
         return out;
     }
 
@@ -66,8 +67,9 @@ public class JobTriggerDao implements RowMapper<JobTrigger> {
 
     public List<JobTrigger> getJobCompletionTriggersFor(String completedJobName) {
         String args[] = {completedJobName};
+        String sql = "select ID,JOB_NAME, TRIGGER_TYPE,TRIGGERING_JOB_NAME, CRON, JOB_PARAMETERS from SCHEDULING_TRIGGER  where TRIGGERING_JOB_NAME=?";
         JdbcTemplate template = new JdbcTemplate(dataSource);
-        List<JobTrigger> out = template.query("select ID,JOB_NAME, TRIGGER_TYPE,TRIGGERING_JOB_NAME, CRON, JOB_PARAMETERS from SCHEDULING_TRIGGER  where TRIGGERING_JOB_NAME=?", args, this);
+        List<JobTrigger> out = template.query(sql, this,args);
         return out;
     }
 

@@ -218,7 +218,7 @@ public class ScheduledJobTasklet implements StoppableTasklet {
             log.debug("active: {}, idle: {}", active, idle);
             log.debug("Check if running with query '{}'", checkIfRunningSql);
             stmt.setString(1, dbmsJobName);
-            try (ResultSet rs = stmt.executeQuery();) {
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String jobName = rs.getString(1);
                     long sessionId = rs.getLong(2);
@@ -265,7 +265,7 @@ public class ScheduledJobTasklet implements StoppableTasklet {
             log.debug("active: {}, idle: {}", active, idle);
 
             stmt.setString(1, dbmsJobName);
-            try (ResultSet rs = stmt.executeQuery();) {
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String jobName = rs.getString(1);
                     status = rs.getString(2);
@@ -308,16 +308,15 @@ public class ScheduledJobTasklet implements StoppableTasklet {
          */
 
         String lf = System.lineSeparator();
-        StringBuilder plsql = new StringBuilder();
-        plsql.append("begin ").append(lf);
-        plsql.append("SYS.DBMS_SCHEDULER.CREATE_JOB(").append(lf);
-        plsql.append("job_name=>'").append(jobName).append("',").append(lf);
-        plsql.append("job_type=>'PLSQL_BLOCK',").append(lf);
-        plsql.append("job_action=>'").append(action).append("',").append(lf);
-        plsql.append("enabled=>TRUE);").append(lf);
-        plsql.append("end;").append(lf);
         //plsql.append("/").append(lf);
-        return plsql.toString();
+        String plsql = "begin " + lf +
+                "SYS.DBMS_SCHEDULER.CREATE_JOB(" + lf +
+                "job_name=>'" + jobName + "'," + lf +
+                "job_type=>'PLSQL_BLOCK'," + lf +
+                "job_action=>'" + action + "'," + lf +
+                "enabled=>TRUE);" + lf +
+                "end;" + lf;
+        return plsql;
     }
 
     private String buildStopStatement(String jobName) {
@@ -327,13 +326,12 @@ public class ScheduledJobTasklet implements StoppableTasklet {
         END;
          */
         String lf = System.lineSeparator();
-        StringBuilder plsql = new StringBuilder();
-        plsql.append("begin ").append(lf);
-        plsql.append("SYS.DBMS_SCHEDULER.STOP_JOB(").append(lf);
-        plsql.append("job_name=>'").append(jobName).append("',").append(lf);
-        plsql.append("force=>TRUE);").append(lf);
-        plsql.append("end;").append(lf);
-        return plsql.toString();
+        String plsql = "begin " + lf +
+                "SYS.DBMS_SCHEDULER.STOP_JOB(" + lf +
+                "job_name=>'" + jobName + "'," + lf +
+                "force=>TRUE);" + lf +
+                "end;" + lf;
+        return plsql;
     }
 }
 

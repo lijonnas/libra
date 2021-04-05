@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -74,7 +75,7 @@ public class SqlQueryReportTasklet extends ThymeleafReportTasklet implements Rep
         List<QueryResult> result = fetchData();
         log.debug("Result length is " + result.size());
         context.setVariable("queryResults", result);
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(reportFile), "utf-8")) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(reportFile), StandardCharsets.UTF_8)) {
             templateEngine.process("dynamic_sql_report", context, writer);
         }
         return new ReportGenerationResult(ReportGenerationResult.ReportGenerationResultStatus.OK);
@@ -165,7 +166,7 @@ public class SqlQueryReportTasklet extends ThymeleafReportTasklet implements Rep
                 columnNames.add(metaData.getColumnName(i + 1));
                 columnTypes.add(metaData.getColumnTypeName(i + 1));
             }
-            this.rows = new ArrayList<List<Object>>();
+            this.rows = new ArrayList<>();
             while (rs.next()) {
                 log.debug("Processing row");
                 ArrayList<Object> row = new ArrayList<>();

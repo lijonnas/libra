@@ -37,10 +37,10 @@ import javax.sql.DataSource;
  * @author zhongshuangli
  * @date 2021-04-01
  */
-@PropertySource("libra_default.yml")
+@PropertySource("libra-default.yml")
 @Configuration()
 @ImportResource({
-        "classpath:spring_beans/job_common.xml"
+        "classpath:spring-beans/job-common.xml"
         ,"file://${libra.jobBeansDir}/*.xml"
         ,"file://${libra.jobBeansDir2}/*.xml"
         ,"file://${libra.jobBeansDir3}/*.xml"

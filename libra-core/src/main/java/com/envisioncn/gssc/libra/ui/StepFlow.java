@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
  */
 @Tag("div")
 public class StepFlow extends Component {
+    private static final long serialVersionUID = 7038606167766823556L;
     HashMap<String, Element> stepToElement = new HashMap<>();
 
     public void init(JobInstanceInfo job) {
@@ -52,7 +53,7 @@ public class StepFlow extends Component {
         // First round, calculate flow durations
         for (StepInfo step : job.getSteps()) {
             if (step.getFlowId() != null) {
-                if (currentFlow == null || !step.getFlowId().equals(currentFlow)) {
+                if (!step.getFlowId().equals(currentFlow)) {
                     currentFlow = step.getFlowId();
                     flowDurations.put(currentFlow, new MutableLong(0));
                     flowCount++;
@@ -70,7 +71,7 @@ public class StepFlow extends Component {
         // Calculate Split durations by calculating max of its flow durations
         for (StepInfo step : job.getSteps()) {
             if (step.getSplitId() != null) {
-                if (currentSplit == null || !step.getSplitId().equals(currentSplit)) {
+                if (!step.getSplitId().equals(currentSplit)) {
                     currentSplit = step.getSplitId();
                     Set<String> flowIds = splitToFlows.get(step.getSplitId());
                     if (flowIds != null) {
@@ -86,7 +87,7 @@ public class StepFlow extends Component {
             }
         }
         // Calculate total duration: sum of splits + steps that are not part of a split
-        Long totalDuration = splitDurations.values().stream().collect(Collectors.summingLong(Long::longValue));
+        Long totalDuration = splitDurations.values().stream().mapToLong(Long::longValue).sum();
         for (StepInfo step : job.getSteps()) {
             if (step.getSplitId() == null) {
                 totalDuration += step.getDuration();

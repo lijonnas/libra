@@ -104,7 +104,7 @@ public class SqlValidation implements ResultSetExtractor {
             columnNames.add(metaData.getColumnName(i + 1));
             columnTypes.add(metaData.getColumnTypeName(i + 1));
         }
-        this.rows = new ArrayList<List<Object>>();
+        this.rows = new ArrayList<>();
         while (rs.next()) {
             log.debug("Processing row");
             ArrayList<Object> row = new ArrayList<>();

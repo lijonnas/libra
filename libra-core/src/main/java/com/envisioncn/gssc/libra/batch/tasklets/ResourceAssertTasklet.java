@@ -8,6 +8,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Asserts that a given directory (file/directory) exists.
@@ -32,8 +33,12 @@ public class ResourceAssertTasklet implements Tasklet {
             if (!file.isDirectory()) {
                 throw new JobExecutionException("Resource is not a directory");
             }
-            if (file.list().length != expectedFileCount) {
-                throw new JobExecutionException("Directory " + resource.getFilename() + " does not contain the expected nr of files " + expectedFileCount + ". Actual nr of files is " + file.list().length);
+            if (Objects.requireNonNull(file.list()).length != expectedFileCount) {
+                throw new JobExecutionException("Directory "
+                        + resource.getFilename()
+                        + " does not contain the expected nr of files "
+                        + expectedFileCount + ". Actual nr of files is "
+                        + Objects.requireNonNull(file.list()).length);
             }
         }
 

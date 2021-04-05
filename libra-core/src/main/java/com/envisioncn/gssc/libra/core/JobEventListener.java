@@ -5,6 +5,6 @@ package com.envisioncn.gssc.libra.core;
  * @date 2021-03-31
  */
 public interface JobEventListener {
-    public void onJobChange(JobInstanceInfo jobInstanceInfo);
-    public void onStepChange(BasicJobInstanceInfo basicJobInstanceInfo, StepInfo stepInfo);
+    void onJobChange(JobInstanceInfo jobInstanceInfo);
+    void onStepChange(BasicJobInstanceInfo basicJobInstanceInfo, StepInfo stepInfo);
 }

@@ -1,5 +1,6 @@
 package com.envisioncn.gssc.libra.core.metadata;
 
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -77,7 +78,7 @@ public class JobMetadataReader {
     }
 
     private Map<String, JobMetadata> parseAll() throws URISyntaxException, IOException {
-        TreeMap<String, JobMetadata> out = new TreeMap();
+        TreeMap<String, JobMetadata> out = Maps.newTreeMap();
         Resource[] resources1 = ResourcePatternUtils
                 .getResourcePatternResolver(resourceLoader)
                 .getResources("file://"+jobBeansDir + "/*.xml");
@@ -112,7 +113,7 @@ public class JobMetadataReader {
 
         DocumentBuilderFactory builderFactory
                 = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = null;
+        DocumentBuilder builder;
         try {
             builder = builderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
@@ -162,13 +163,13 @@ public class JobMetadataReader {
                 }
             }
         }
-        HashMap<String, ArrayList<StepMetadata>> splitIdTosteps = new HashMap<>();
+        HashMap<String, ArrayList<StepMetadata>> splitIdTosteps = Maps.newHashMap();
         for (StepMetadata step: job.getAllSteps()) {
             if (step.getSplit() != null) {
                 String splitId = step.getSplit().getId();
                 log.debug("Handling split {}", splitId);
                 if (!splitIdTosteps.containsKey(splitId)) {
-                    splitIdTosteps.put(splitId, new ArrayList<StepMetadata>());
+                    splitIdTosteps.put(splitId, new ArrayList<>());
                 }
                 splitIdTosteps.get(splitId).add(step);
             }

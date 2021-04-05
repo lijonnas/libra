@@ -24,6 +24,7 @@ import org.thymeleaf.context.Context;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +91,7 @@ public class MongoQueryReportTasklet extends ThymeleafReportTasklet implements R
         List<QueryResult> result = fetchData();
         log.debug("Result length is " + result.size());
         context.setVariable("queryResults", result);
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(reportFile), "utf-8")) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(reportFile), StandardCharsets.UTF_8)) {
             templateEngine.process("dynamic_sql_report", context, writer);
         }
         return new ReportGenerationResult(ReportGenerationResult.ReportGenerationResultStatus.OK);

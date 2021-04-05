@@ -43,6 +43,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import java.util.Set;
 @Component
 @UIScope
 public class SchedulingView extends VerticalLayout implements SelectionListener<Grid<JobTrigger>, JobTrigger> {
+    private static final long serialVersionUID = 1033318906001818837L;
     @Autowired
     JobTriggerDao jobTriggerDao;
 
@@ -99,29 +101,21 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
         triggerGrid.addSelectionListener(this);
         add(triggerGrid);
         HorizontalLayout buttons = new HorizontalLayout();
-        removeButton = new Button("Remove", clickEvent -> {
-            remove();
-        });
+        removeButton = new Button("Remove", clickEvent -> remove());
         removeButton.setIcon(VaadinIcon.MINUS_CIRCLE.create());
         removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         removeButton.setEnabled(false);
         buttons.add(removeButton);
-        editButton = new Button("Edit", clickEvent -> {
-            edit();
-        });
+        editButton = new Button("Edit", clickEvent -> edit());
         editButton.setIcon(VaadinIcon.EDIT.create());
         editButton.setEnabled(false);
         buttons.add(editButton);
 
-        addCronButton = new Button("Add CRON trigger ..", clickEvent -> {
-            addCron(null);
-        });
+        addCronButton = new Button("Add CRON trigger ..", clickEvent -> addCron(null));
         addCronButton.setIcon(VaadinIcon.CALENDAR_CLOCK.create());
         // addCronButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
         buttons.add(addCronButton);
-        addJobCompletionButton = new Button("Add Job complete trigger ..", clickEvent -> {
-            addJobCompletion(null);
-        });
+        addJobCompletionButton = new Button("Add Job complete trigger ..", clickEvent -> addJobCompletion(null));
         addJobCompletionButton.setIcon(VaadinIcon.FLAG_CHECKERED.create());
         // addJobCompletionButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
         buttons.add(addJobCompletionButton);
@@ -207,7 +201,7 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
     }
 
     private com.vaadin.flow.component.Component createTimestampColumn(Date timestamp) {
-        DateFormat tstampFormat = new SimpleDateFormat("YYMMdd HH:mm:ss");
+        DateFormat tstampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Label label = new Label(tstampFormat.format(timestamp));
         label.getStyle().set("font-size", "0.8em");
         return label;
@@ -239,21 +233,21 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
     }
 
     private com.vaadin.flow.component.Component createTypeComponent(JobTrigger.TriggerType triggerType, boolean log) {
+        Icon icon;
         if (triggerType.equals(JobTrigger.TriggerType.CRON)) {
-            Icon icon = VaadinIcon.CALENDAR_CLOCK.create();
+            icon = VaadinIcon.CALENDAR_CLOCK.create();
             if (log) {
                 icon.setSize("0.8em");
             }
             icon.getElement().setProperty("title", "CRON trigger");
-            return icon;
         } else {
-            Icon icon = VaadinIcon.FLAG_CHECKERED.create();
+            icon = VaadinIcon.FLAG_CHECKERED.create();
             if (log) {
                 icon.setSize("0.8em");
             }
             icon.getElement().setProperty("title", "Job completion trigger");
-            return icon;
         }
+        return icon;
     }
 
     @PostConstruct
@@ -287,7 +281,7 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
             String json = mapper.writeValueAsString(this.triggers);
-            return new ByteArrayInputStream(json.getBytes("UTF-8"));
+            return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new RuntimeException("Failed to stream scheduling configuration", e);
         }
@@ -352,18 +346,13 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
         ArrayList<String> jobNames = new ArrayList<>(jobRegistry.getJobNames());
         Collections.sort(jobNames);
 
-        ComboBox<String> jobComboBox = new ComboBox<String>("Job");
+        ComboBox<String> jobComboBox = new ComboBox<>("Job");
         jobComboBox.setItems(jobNames);
         jobComboBox.setRequired(true);
         jobComboBox.setRequiredIndicatorVisible(true);
         jobComboBox.setWidthFull();
-        jobComboBox.addValueChangeListener(comboBoxStringComponentValueChangeEvent -> {
-            if (jobComboBox.isEmpty()) {
-                jobComboBox.setInvalid(true);
-            } else {
-                jobComboBox.setInvalid(false);
-            }
-        });
+        jobComboBox.addValueChangeListener(comboBoxStringComponentValueChangeEvent ->
+                jobComboBox.setInvalid(jobComboBox.isEmpty()));
         layout.add(jobComboBox);
 
         TextField cron = new TextField("CRON");
@@ -436,9 +425,7 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
             dialog.close();
 
         });
-        Button cancelButton = new Button("Cancel", clickEvent -> {
-            dialog.close();
-        });
+        Button cancelButton = new Button("Cancel", clickEvent -> dialog.close());
         buttons.add(okButton);
         buttons.add(cancelButton);
         layout.add(buttons);
@@ -481,14 +468,14 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
         ArrayList<String> jobNames = new ArrayList<>(jobRegistry.getJobNames());
         Collections.sort(jobNames);
 
-        ComboBox<String> jobComboBox = new ComboBox<String>("Job");
+        ComboBox<String> jobComboBox = new ComboBox<>("Job");
         jobComboBox.setItems(jobNames);
         jobComboBox.setRequired(true);
         jobComboBox.setRequiredIndicatorVisible(true);
         jobComboBox.setWidthFull();
         layout.add(jobComboBox);
 
-        ComboBox<String> triggeredByComboBox = new ComboBox<String>("Triggered by");
+        ComboBox<String> triggeredByComboBox = new ComboBox<>("Triggered by");
         triggeredByComboBox.setItems(jobNames);
         triggeredByComboBox.setRequired(true);
         triggeredByComboBox.setRequiredIndicatorVisible(true);
@@ -538,9 +525,7 @@ public class SchedulingView extends VerticalLayout implements SelectionListener<
             saveOrUpdate(trigger);
             dialog.close();
         });
-        Button cancelButton = new Button("Cancel", clickEvent -> {
-            dialog.close();
-        });
+        Button cancelButton = new Button("Cancel", clickEvent -> dialog.close());
         buttons.add(okButton);
         buttons.add(cancelButton);
         layout.add(buttons);
