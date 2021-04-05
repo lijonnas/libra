@@ -256,10 +256,10 @@ public class JobMetadataReader {
                     String class_ = ce.getAttribute("class");
                     String parent = ce.getAttribute("parent");
                     if (class_ != null && class_.length() > 0) {
-                        if ("se.ikama.bauta.batch.tasklet.oracle.ScheduledJobTasklet".equals(class_)) {
+                        if ("com.envisioncn.gssc.libra.batch.tasklets.postgresql.ScheduledJobTasklet".equals(class_)) {
                             step.setStepType(StepMetadata.StepType.SCH);
                             return;
-                        } else if ("se.ikama.bauta.batch.tasklet.ResourceAssertTasklet".equals(class_)) {
+                        } else if ("com.envisioncn.gssc.libra.batch.tasklets.ResourceAssertTasklet".equals(class_)) {
                             step.setStepType(StepMetadata.StepType.ASSERT);
                             return;
                         } else if (class_.contains("Report")) {

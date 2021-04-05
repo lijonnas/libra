@@ -59,7 +59,7 @@ public class ReportingSystemCommandTasklet extends StepExecutionListenerSupport
     @Autowired
     Environment env;
 
-    @Value("${bauta.reportDir}")
+    @Value("${libra.reportDir}")
     protected String reportDir;
 
     /**

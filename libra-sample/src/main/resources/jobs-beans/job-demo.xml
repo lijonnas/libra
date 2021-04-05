@@ -10,7 +10,7 @@ http://www.springframework.org/schema/batch http://www.springframework.org/schem
 
 
     <bean id="demoReader" class="org.springframework.batch.item.file.FlatFileItemReader" >
-        <property name="resource" value="file://${bauta.dataDir}/demo/input.csv" />
+        <property name="resource" value="file://${libra.dataDir}/demo/input.csv" />
         <property name="linesToSkip" value="1" />
         <property name="recordSeparatorPolicy">
             <bean class="org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy"/>
@@ -43,7 +43,7 @@ http://www.springframework.org/schema/batch http://www.springframework.org/schem
     </bean>
     <bean id="demoWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
         <!-- write to this csv file -->
-        <property name="resource" value="file://${bauta.dataDir}/demo/output.csv" />
+        <property name="resource" value="file://${libra.dataDir}/demo/output.csv" />
         <property name="shouldDeleteIfExists" value="true" />
 
         <property name="lineAggregator">

@@ -40,9 +40,9 @@ public class LibraAutoConfiguration implements EnvironmentPostProcessor {
     @Bean
     @ConditionalOnMissingBean
     public LibraConfig libraConfig() {
-        String homeDir = libraProperties.getHomeDir() == null ? System.getProperty("bauta.homeDir") : libraProperties.getHomeDir();
-        String jobBeansDir = libraProperties.getJobBeansDir() == null ? System.getProperty("bauta.jobBeansDir") : libraProperties.getJobBeansDir();
-        String reportDir = libraProperties.getJobBeansDir() == null ? System.getProperty("bauta.reportDir") : libraProperties.getReportDir();
+        String homeDir = libraProperties.getHomeDir() == null ? System.getProperty("libra.homeDir") : libraProperties.getHomeDir();
+        String jobBeansDir = libraProperties.getJobBeansDir() == null ? System.getProperty("libra.jobBeansDir") : libraProperties.getJobBeansDir();
+        String reportDir = libraProperties.getJobBeansDir() == null ? System.getProperty("libra.reportDir") : libraProperties.getReportDir();
 
         LibraConfig libraConfig = new LibraConfig();
         libraConfig.put(HOME_DIR, homeDir);

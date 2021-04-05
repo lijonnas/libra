@@ -46,7 +46,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>se.ikama.bauta.sample.BautaSampleOracleApplication</mainClass>
+                    <mainClass>com.envisioncn.gssc.libra.sample.LibraSamplePostgresqlApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -76,7 +76,7 @@
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
                     </generateGitPropertiesFilename>
                     <format>properties</format>
-                    <prefix>bauta.application.git</prefix>
+                    <prefix>libra.application.git</prefix>
                     <gitDescribe>
                         <skip>false</skip>
                         <always>false</always>
